@@ -27,3 +27,26 @@ jobs:
         run: bundle exec jekyll build --baseurl "/LJT-Homepage"
         env:
           JEKYLL_ENV: production
+      - name: Verify rendered HTML
+        run: |
+          set +e
+          P=_site/publications/index.html
+          H=_site/index.html
+          echo "== publication detail dirs =="
+          ls _site/publication
+          for t in "SynLogic" "Perception Bottleneck" "Universal Truthfulness" "In-Context Sharpness" "C-Eval" "Composing Parameter-Efficient"; do
+            printf 'PUBPAGE [%s]: ' "$t"; grep -q "$t" "$P" && echo FOUND || echo MISSING
+            printf 'HOME    [%s]: ' "$t"; grep -q "$t" "$H" && echo FOUND || echo MISSING
+          done
+          echo "== category headings =="
+          grep -o -E "<h2[^>]*>[^<]+" "$P"
+          echo "== venue/year lines =="
+          grep -o -E "Published in <i>[^<]+</i>, [0-9]{4}" "$P"
+          echo "== home publications link =="
+          grep -o -E "href=\"[^\"]*publications/\"" "$H" | sort -u
+          echo "== home contact =="
+          grep -o "jliugi@connect.ust.hk" "$H" | head -1
+          grep -o "github.com/Vicent0205" "$H" | head -1
+          grep -o "junteng88716710" "$H" | head -1
+          grep -o "user=tbK9jl4AAAAJ" "$H" | head -1
+          echo "== DONE =="
